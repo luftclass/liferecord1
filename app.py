@@ -1,23 +1,26 @@
 import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import pandas as pd
 
-# 구글 시트 연결
+# 구글 시트 연결 설정
 scope = ["https://spreadsheets.google.com/feeds",
          "https://www.googleapis.com/auth/drive"]
+
 creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
 client = gspread.authorize(creds)
-
 sheet = client.open("2025_구산고_1학년_행발").sheet1
 
-st.title("2025 구산고 1학년 학생 데이터 입력")
+st.title("2025 구산고 1학년 학생 정보 입력")
 
+# 입력 폼
+class_num = st.selectbox("반", list(range(1, 9)))
+student_num = st.selectbox("번호", list(range(1, 31)))
 name = st.text_input("이름")
-class_num = st.number_input("반", min_value=1, max_value=10, step=1)
-student_num = st.number_input("번호", min_value=1, max_value=50, step=1)
-activity = st.text_area("희망 활동 / 비고")
 
+# 제출
 if st.button("제출"):
-    sheet.append_row([name, class_num, student_num, activity])
-    st.success("제출 완료! 감사합니다.")
+    if name.strip() == "":
+        st.warning("이름을 입력해주세요.")
+    else:
+        sheet.append_row([class_num, student_num, name])
+        st.success("제출이 완료되었습니다! 감사합니다.")
